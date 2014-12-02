@@ -15,11 +15,15 @@ def getThrottles(baseurl):
     bandwidths = {}
     r = requests.get(baseurl, verify=False, auth=AUTH)
     results = r.json()
-
     for group in results:
         bandwidths[group['name']] = group['activeLinksSettings'][0]['linkPolicy']['protectionPolicy']['bandwidthLimit']
-
     return bandwidths
+
+
+def getAllGroupInfo(baseurl):
+    r = requests.get(baseurl, verify=False, auth=AUTH)
+    results = r.json()
+    return results
 
 
 def outputThrottles(bandwidths):
@@ -37,10 +41,7 @@ def isIP_v2(address):
         ip = True
     except socket.error:
         ip = False
-
     return ip
-
-
 
 
 if __name__ == '__main__':
@@ -51,7 +52,6 @@ if __name__ == '__main__':
     args = parser.parse_args()
     if isIP_v2(args.ipaddress):
         BASEURL = 'https://' + args.ipaddress + '/fapi/rest/4_0/settings/groups/all'
-
         bandwidths = getThrottles(BASEURL)
         outputThrottles(bandwidths)
     else:
