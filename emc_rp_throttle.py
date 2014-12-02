@@ -32,8 +32,9 @@ def outputThrottles(bandwidths):
 
 if __name__ == '__main__':
 
-    parser = argparse.ArgumentParser()
-    parser.add_argument('-ip', '--ipaddress', help="Input the ip address of the RPA cluster here")
+    parser = argparse.ArgumentParser(description="Script to display all Consistency Group Bandwidth Limits")
+    required_group = parser.add_argument_group('Required Arguments')
+    required_group.add_argument('-ip', '--ipaddress', help="Input the ip address of the RPA cluster here", required=True)
     args = parser.parse_args()
 
     BASEURL = 'https://' + args.ipaddress + '/fapi/rest/4_0/settings/groups/all'
