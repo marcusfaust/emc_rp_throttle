@@ -12,14 +12,12 @@ AUTH = HTTPBasicAuth('admin', 'admin')
 
 def getThrottles(baseurl):
     bandwidths = {}
-    total = 0
     r = requests.get(baseurl, verify=False, auth=AUTH)
     results = r.json()
 
     for group in results:
         bandwidths[group['name']] = group['activeLinksSettings'][0]['linkPolicy']['protectionPolicy']['bandwidthLimit']
 
-    bandwidths['total'] = total
     return bandwidths
 
 
