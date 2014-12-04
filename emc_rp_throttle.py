@@ -60,6 +60,19 @@ def setThrottle(cg, throttle, baseurl):
             url = baseurl + '/settings/groups/' + str(uid) + '/full'
             r = requests.get(url, verify=False, auth=AUTH)
             results = r.json()
+            firstCopy = results['activeLinksSettings'][0]['groupLinkUID']['firstCopy']
+            secondCopy = results['activeLinksSettings'][0]['groupLinkUID']['secondCopy']
+            link_policy = results['activeLinksSettings'][0]['linkPolicy']
+            link_policy['protectionPolicy']['bandwidthLimit'] = float(throttle)
+
+            url = baseurl + '/settings/groups/' + str(uid) + '/actions/set_link_policy'
+            params = [{'firstcopy': firstCopy}, {'secondCopy': secondCopy}, {'policy': link_policy}]
+            params = json.dumps(params)
+            headers = { 'Content-Type' : 'application/json' }
+            r = requests.post(url, data=json.dumps(params), headers=headers,auth=AUTH, verify=False)
+            print r.text
+
+            results = r.json()
             print "done"
 
 
@@ -120,5 +133,7 @@ if __name__ == '__main__':
     if set_throttle:
         if args.cg in CG_NAME_MAP.values():
             setThrottle(args.cg, args.throttle, BASEURL)
+        else:
+            sys.exit("Invalid CG Name.  Exiting.")
     elif get_throttles:
         outputThrottles(bandwidths)
