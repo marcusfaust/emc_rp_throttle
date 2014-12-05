@@ -71,7 +71,7 @@ def setThrottle(cg, throttle, baseurl):
             headers = { 'Content-Type' : 'application/json' }
             r = requests.post(url, data=params, headers=headers,auth=AUTH, verify=False)
 
-            print "\n\nSuccessfully set " + cg + "'s bandwidth throttle to " + throttle + " Mbps.\n"
+            print "\n\nSuccessfully set " + cg + "'s bandwidth throttle to " + throttle + " Mbps."
 
 
 def outputWanStats(groupstats,groupsettings):
@@ -107,10 +107,10 @@ if __name__ == '__main__':
     actions_group.add_argument('-w', '--wanstats', help="Display WAN CG Statistics", action="store_true")
     required_group = parser.add_argument_group('Required Arguments')
     required_group.add_argument('-ip', '--ipaddress', help="Input the ip address of the RPA cluster here", required=True)
-    subparsers = parser.add_subparsers()
+    subparsers = parser.add_subparsers(dest='subcmd')
     set_throttle = subparsers.add_parser('set_throttle', help="Specify this with -cg and -throttle arguments to set a limit on a CG.")
     set_throttle.add_argument('-cg', '--cg', help="Input the name of the CG here", required=True, dest='cg')
-    set_throttle.add_argument('-throttle', '--throttle', help="Input the Mbps throttle value here.", required=True, dest='throttle')
+    set_throttle.add_argument('-t', '--Mbps', help="Input the Mbps throttle value here.", required=True, dest='throttle')
     get_throttles = subparsers.add_parser('get_throttles', help="Displays All CG Throttles")
     args = parser.parse_args()
 
@@ -128,11 +128,11 @@ if __name__ == '__main__':
     if args.wanstats:
         outputWanStats(groupstats, groupsettings)
 
-    if set_throttle:
+    if args.subcmd == 'set_throttle':
         if args.cg in CG_NAME_MAP.values():
             setThrottle(args.cg, args.throttle, BASEURL)
             outputThrottles(bandwidths)
         else:
             sys.exit("Invalid CG Name.  Exiting.")
-    elif get_throttles:
+    elif args.subcmd == 'get_throttles':
         outputThrottles(bandwidths)
