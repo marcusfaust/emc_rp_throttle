@@ -48,9 +48,9 @@ def outputThrottles(bandwidths):
     total = 0.0
     print '\n\nCurrent CG Bandwidth Limits:\n'
     for name, throttle in bandwidths.items():
-        print '{0:20} : {1:10f} Mbps'.format(name, throttle)
+        print '{0:20} : {1:10.2f} Mbps'.format(name, throttle)
         total += throttle
-    print '\n{0:20} : {1:10f} Mbps'.format('TOTAL:', total)
+    print '\n{0:20} : {1:10.2f} Mbps'.format('TOTAL:', total)
 
 
 def setThrottle(cg, throttle, baseurl):
@@ -66,14 +66,12 @@ def setThrottle(cg, throttle, baseurl):
             link_policy['protectionPolicy']['bandwidthLimit'] = float(throttle)
 
             url = baseurl + '/settings/groups/' + str(uid) + '/actions/set_link_policy'
-            params = [{'firstcopy': firstCopy}, {'secondCopy': secondCopy}, {'policy': link_policy}]
+            params = {'firstCopy': firstCopy, 'secondCopy': secondCopy, 'policy': link_policy}
             params = json.dumps(params)
             headers = { 'Content-Type' : 'application/json' }
-            r = requests.post(url, data=json.dumps(params), headers=headers,auth=AUTH, verify=False)
-            print r.text
+            r = requests.post(url, data=params, headers=headers,auth=AUTH, verify=False)
 
-            results = r.json()
-            print "done"
+            print "\n\nSuccessfully set " + cg + "'s bandwidth throttle to " + throttle + " Mbps.\n"
 
 
 def outputWanStats(groupstats,groupsettings):
@@ -133,6 +131,7 @@ if __name__ == '__main__':
     if set_throttle:
         if args.cg in CG_NAME_MAP.values():
             setThrottle(args.cg, args.throttle, BASEURL)
+            outputThrottles(bandwidths)
         else:
             sys.exit("Invalid CG Name.  Exiting.")
     elif get_throttles:
